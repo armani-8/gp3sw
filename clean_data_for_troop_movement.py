@@ -1,6 +1,7 @@
 import pandas as pd
 import pickle
 from sklearn.preprocessing import LabelEncoder
+import json
 
 def clean_data():
     df = pd.read_csv("troop_movements10m.csv")
@@ -9,11 +10,13 @@ def clean_data():
     df["location_x"].ffill(inplace=True)
     df["location_y"].ffill(inplace=True)
 
-    # Assuming that homeworld and unit_type are categorical features
-    le_homeworld = LabelEncoder()
-    le_unit_type = LabelEncoder()
+    with open("home_worlds.json", "r") as file:
+        home_worlds = json.load(file)
+        home_worlds_mapping = {entry["id"]: entry["name"] for entry in home_worlds}
 
-    df['homeworld'] = le_homeworld.fit_transform(df['homeworld'].astype(str))
+    df["homeworld"] = df["homeworld"].map(home_worlds_mapping)
+
+    le_unit_type = LabelEncoder()
     df['unit_type'] = le_unit_type.fit_transform(df['unit_type'].astype(str))
 
     df.to_parquet("troop_movements10m.parquet", index=False)
@@ -24,8 +27,6 @@ def predict_data():
         model = pickle.load(file)
 
     df = pd.read_parquet("troop_movements10m.parquet")
-
-    print(df.columns)
 
     df["is_resistance"] = model.predict(df[["homeworld", "unit_type"]])
 
