@@ -1,4 +1,6 @@
 import pandas as pd
+import pickle
+from sklearn.preprocessing import LabelEncoder
 
 def clean_data():
     df = pd.read_csv("troop_movements10m.csv")
@@ -15,7 +17,10 @@ def predict_data():
         model = pickle.load(file)
     
     df = pd.read_parquet("troop_movements10m.parquet")
-    df["is_resistance"] = model.predict(df[["home_world", "unit_type"]])
+
+    print(df.columns)
+
+    df["is_resistance"] = model.predict(df[["homeworld", "unit_type"]])
     
     print(df.head())
 

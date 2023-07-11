@@ -21,7 +21,7 @@ def generate_data():
             "location_y": random.randint(0, 100),
             "destination_x": random.randint(0, 100),
             "destination_y": random.randint(0, 100),
-            "home_world": random.choice(home_worlds)
+            "homeworld": random.choice(home_worlds)
         }
         data.append(record)
     
